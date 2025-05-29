@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import { Route, Routes } from "react-router-dom";
 import ApiServicesPage from "./pages/apiservices/ApiServicesPage";
 
+import Footer from "@/components/Footer";
+
 function App() {
   
   return (
