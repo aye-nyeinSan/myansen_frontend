@@ -14,7 +14,6 @@ import { useToast } from "@/hooks/use-toast";
 export default function ApiServicesPage() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [newKeyName, setNewKeyName] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
 
@@ -48,9 +47,32 @@ export default function ApiServicesPage() {
     // Logic to generate a new API key
     console.log("API Key generated");
     if (newKeyName.trim() === "") {
-       setError("Key name cannot be empty.");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Empty Key Name",
+        description: "Please write something as key name.",
+        className: "w-96 text-justify",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
       return;
     }
+
+    const newKey: ApiKey = {
+      id: `key-${Date.now()}`,
+      name: newKeyName,
+      created: new Date(),
+      lastUsed: new Date(),
+    };
+    setApiKeys((prevKeys) => [...prevKeys, newKey]);
+    setNewKeyName("");
+    toast({
+      title: "API Key Created",
+      description: `New API key "${newKey.name}" has been created successfully.`,
+      className: "w-96 text-justify",
+    });
+
+  
+
   };
   return (
     <div className="grid w-full place-content-center  gap-4 mt-8">
@@ -65,28 +87,13 @@ export default function ApiServicesPage() {
         />
         <Button
           className="w-32  p-2 mx-4"
-          onClick={() => {
-            toast({
-              variant: "destructive",
-              title: "Uh oh! Empty Key Name",
-              description: "Please write something as key name.",
-              className: "w-96",
-              action: <ToastAction altText="Try again">Try again</ToastAction>,
-            });
-          }}
+        
+          onClick={handleGenerateKey}
         >
           Generate Key
         </Button>
       </div>
-      <div>
-        {error && (
-          <Alert variant="destructive" className="w-96">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            {error}
-          </Alert>
-        )}
-      </div>
+     
 
       {/* API Keys Management Table Section */}
       <div className="container mx-auto py-5">
