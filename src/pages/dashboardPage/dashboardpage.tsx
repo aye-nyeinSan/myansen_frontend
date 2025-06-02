@@ -9,9 +9,21 @@ export default function DashboardPage() {
 
     // Mock data for sentiment analysis
     const sentimentData: SentimentColumn[] = [
-      { text: "I love this product!", sentiment: "positive", confidence: 0.95 },
-      { text: "This is okay, not great.", sentiment: "neutral", confidence: 0.65 },
-      { text: "I hate waiting for updates.", sentiment: "negative", confidence: 0.85 },
+      {
+        text: "ဒီ မျက်နှာသစ်ဆေးသုံးပီးထဲကမျက်နှာက ကြည်ပီး glow လာတာ တော်တော် အဆင်ပြေပီး ဈေးလဲ တော်တယ်",
+        sentiment: "positive",
+        confidence: 0.95,
+      },
+      {
+        text: "ဒီခေါင်းလျှော်ရည်လေး ဘယ်မှာဝယ်လို့ရမလဲရှင့် ညွှန်းပေးပါအုံးရှင",
+        sentiment: "neutral",
+        confidence: 0.65,
+      },
+      {
+        text: "I hate waiting for updates.",
+        sentiment: "negative",
+        confidence: 0.85,
+      },
     ];
     return (
       <>

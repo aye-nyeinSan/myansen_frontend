@@ -4,12 +4,28 @@ import { type SentimentColumn } from "@/types/sentimentColums";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "./ui/badge";
+import { useState } from "react";
 
 
 export const sentimentColumns: ColumnDef<SentimentColumn>[] = [
   {
     accessorKey: "text",
-    header: "Text",
+        header: "Text",
+        cell: ({ row }) => { 
+            let sentimentScore: number = row.getValue("confidence") as number;
+            if (sentimentScore <= (0.6 * 100)) {
+                return (
+                  <div className="flex flex-col ">
+                    <span className="text-black text-start"> {row.getValue("text")}</span>
+                    <Badge className="w-52 ml-2 px-2.5 py-1 mt-2  text-xs text-yellow-700 bg-yellow-100 border border-yellow-400  rounded-xl hover:bg-yellow-200 ">
+                      Low confidence - Please review
+                    </Badge>
+                  </div>
+                );
+            } 
+            return <span className="text-black text-start">{row.getValue("text")}</span>;
+        }
+        
   },
   {
     accessorKey: "sentiment",
@@ -37,19 +53,22 @@ export const sentimentColumns: ColumnDef<SentimentColumn>[] = [
     header: "Confidence",
     cell: ({ row }) => {
         const confidence: number = row.getValue("confidence") as number;
-        return <Badge variant={"secondary"} className="hover:cursor-default">{confidence}</Badge>;
+        return <Badge variant={"secondary"} className="hover:cursor-default">{confidence * 100}%</Badge>;
     },
   },
   {
     id: "feedback",
     header: "Feedback",
     cell: ({ row }) => {
-
+        const defaultValue = row.getValue("sentiment") as string;
+        const [selectedValue, setSelectedValue] = useState(defaultValue);
 
         return (
           <div className="inline-block">
     
-              <RadioGroup defaultValue="positive" className="flex flex-row mb-3">
+                <RadioGroup defaultValue={defaultValue}
+                    className="flex flex-row mb-3"
+                onValueChange={setSelectedValue}>
                 <div className="flex items-center gap-3">
                   <RadioGroupItem value="positive" id="r1" />
                   <Label htmlFor="r1">Positive</Label>
@@ -66,9 +85,9 @@ export const sentimentColumns: ColumnDef<SentimentColumn>[] = [
             
             <Button
                 variant="default"
-                disabled={false}
+                disabled={selectedValue === defaultValue}
               onClick={() => alert("Feedback submitted!")}
-              className=" bg-teal-600  text-white hover:bg-teal-700 px-0 cursor-pointer px-3 "
+              className=" bg-teal-600  text-white hover:bg-teal-700 cursor-pointer px-3 "
             >
               Submit Feedback
             </Button>
