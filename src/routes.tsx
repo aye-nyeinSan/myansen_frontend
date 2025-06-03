@@ -7,11 +7,12 @@ import NotFoundPage from "@/pages/ErrorPage/NotFoundPage";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
 import ApiServicesPage from "@/pages/apiservices/ApiServicesPage";
+import UniversalErrorPage  from "@/pages/ErrorPage/UniversalErrorPage";
 
 export const router = createBrowserRouter([
   {
     element: <App />,
-    errorElement: <NotFoundPage />,
+    errorElement: <UniversalErrorPage />,
     children: [
       {
         path: "/",
