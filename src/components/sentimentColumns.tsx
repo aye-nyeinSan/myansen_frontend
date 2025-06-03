@@ -8,34 +8,42 @@ import { useState } from "react";
 
 
 export const sentimentColumns: ColumnDef<SentimentColumn>[] = [
-  {
+ {
     accessorKey: "text",
-        header: "Text",
-        cell: ({ row }) => { 
-            let sentimentScore: number = row.getValue("confidence") as number;
-            if (sentimentScore <= (0.6 * 100)) {
-                return (
-                  <div className="flex flex-col ">
-                    <span className="text-black text-start text-wrap">
-                      {" "}
-                      {row.getValue("text")}
-                    </span>
-                    <Badge className="w-52 ml-2 px-2.5 py-1 mt-3  text-xs text-yellow-700 bg-yellow-100 border border-yellow-400  rounded-xl hover:bg-yellow-200 ">
-                      Low confidence - Please review
-                    </Badge>
-                  </div>
-                );
-            } 
-            return <span className="text-black text-start text-wrap">{row.getValue("text")}</span>;
-        }
-        
-  },
+    header: "Text",
+    cell: ({ row }) => { 
+      const sentimentScore = row.getValue("confidence") as number;
+
+      const isLowConfidence = sentimentScore <= 0.6; 
+
+      if (isLowConfidence) {
+        return (
+          <div className="flex flex-col items-start">
+            <span className="text-black text-left text-wrap">
+              {row.getValue("text")}
+            </span>
+            <Badge className="w-52 ml-2 px-2.5 py-1 mt-3 text-xs text-yellow-700 bg-yellow-100 border border-yellow-400 rounded-xl hover:bg-yellow-200 ">
+              Low confidence - Please review
+            </Badge>
+          </div>
+        );
+      } else {
+        return (
+          <div className="flex flex-col items-start">
+            <span className="text-black text-left text-wrap">
+              {row.getValue("text")}
+            </span>
+          </div>
+        );
+      }
+  }
+},
   {
     accessorKey: "sentiment",
     header: "Sentiment",
       cell: ({ row }) => {
           const sentiment: string = row.getValue("sentiment") as string;
-          // Determine the sentiment color
+
           let positive = "text-green-500";
           let negative = "text-red-500";
           let neutral = "text-yellow-500";

@@ -59,6 +59,8 @@ export function DataTable<TData, TValue>({
             
               let sentimentScore: number = row.getValue("confidence") as number;
               const shouldHighlight = sentimentScore <= 0.6; 
+              let text: string = row.getValue("text") as string;
+
 
               return (
               
@@ -66,9 +68,10 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className={shouldHighlight ? "bg-yellow-50 hover:bg-yellow-100" : ""}
+                 
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="p-4">
+                  <TableCell key={cell.id} className="p-4 ">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
