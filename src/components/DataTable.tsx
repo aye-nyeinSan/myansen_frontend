@@ -17,11 +17,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  noCase?: string; // Optional prop for no data case
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  noCase = "No data available", 
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -38,7 +40,7 @@ export function DataTable<TData, TValue>({
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="text-center">
+                  <TableHead key={header.id} className="text-center w-[200px]">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -53,10 +55,17 @@ export function DataTable<TData, TValue>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map((row) => {
+            
+              let sentimentScore: number = row.getValue("confidence") as number;
+              const shouldHighlight = sentimentScore <= 0.6; 
+
+              return (
+              
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={shouldHighlight ? "bg-yellow-50 hover:bg-yellow-100" : ""}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="p-4">
@@ -64,11 +73,12 @@ export function DataTable<TData, TValue>({
                   </TableCell>
                 ))}
               </TableRow>
-            ))
+            )
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No key is generated yet.
+                <span dangerouslySetInnerHTML={{ __html: noCase }} />
               </TableCell>
             </TableRow>
           )}

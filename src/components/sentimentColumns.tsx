@@ -16,14 +16,17 @@ export const sentimentColumns: ColumnDef<SentimentColumn>[] = [
             if (sentimentScore <= (0.6 * 100)) {
                 return (
                   <div className="flex flex-col ">
-                    <span className="text-black text-start"> {row.getValue("text")}</span>
-                    <Badge className="w-52 ml-2 px-2.5 py-1 mt-2  text-xs text-yellow-700 bg-yellow-100 border border-yellow-400  rounded-xl hover:bg-yellow-200 ">
+                    <span className="text-black text-start text-wrap">
+                      {" "}
+                      {row.getValue("text")}
+                    </span>
+                    <Badge className="w-52 ml-2 px-2.5 py-1 mt-3  text-xs text-yellow-700 bg-yellow-100 border border-yellow-400  rounded-xl hover:bg-yellow-200 ">
                       Low confidence - Please review
                     </Badge>
                   </div>
                 );
             } 
-            return <span className="text-black text-start">{row.getValue("text")}</span>;
+            return <span className="text-black text-start text-wrap">{row.getValue("text")}</span>;
         }
         
   },
@@ -64,30 +67,31 @@ export const sentimentColumns: ColumnDef<SentimentColumn>[] = [
         const [selectedValue, setSelectedValue] = useState(defaultValue);
 
         return (
-          <div className="inline-block">
-    
-                <RadioGroup defaultValue={defaultValue}
-                    className="flex flex-row mb-3"
-                onValueChange={setSelectedValue}>
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="positive" id="r1" />
-                  <Label htmlFor="r1">Positive</Label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="neutral" id="r2" />
-                  <Label htmlFor="r2">Neutral</Label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="negative" id="r3" />
-                  <Label htmlFor="r3">Negative</Label>
-                </div>
-              </RadioGroup>
-            
+          <div className="inline-block ">
+            <RadioGroup
+              defaultValue={defaultValue}
+              className="flex flex-row mb-3 "
+              onValueChange={setSelectedValue}
+            >
+              <div className="flex items-center gap-3">
+                <RadioGroupItem value="positive" id="r1" />
+                <Label htmlFor="r1">Positive</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem value="neutral" id="r2" />
+                <Label htmlFor="r2">Neutral</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem value="negative" id="r3" />
+                <Label htmlFor="r3">Negative</Label>
+              </div>
+            </RadioGroup>
+
             <Button
-                variant="default"
-                disabled={selectedValue === defaultValue}
+              variant="default"
+              disabled={selectedValue === defaultValue}
               onClick={() => alert("Feedback submitted!")}
-              className=" bg-teal-600  text-white hover:bg-teal-700 cursor-pointer px-3 "
+              className=" bg-teal-600 mt-3 px-3 text-sm font-medium shadow-sm text-white hover:bg-teal-700 cursor-pointer  hover:shadow-lg transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Submit Feedback
             </Button>

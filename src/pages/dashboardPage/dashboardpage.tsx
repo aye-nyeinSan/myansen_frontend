@@ -10,14 +10,14 @@ export default function DashboardPage() {
     // Mock data for sentiment analysis
     const sentimentData: SentimentColumn[] = [
       {
-        text: "ဒီ မျက်နှာသစ်ဆေးသုံးပီးထဲကမျက်နှာက ကြည်ပီး glow လာတာ တော်တော် အဆင်ပြေပီး ဈေးလဲ တော်တယ်",
+        text: "ဒီ မျက်နှာသစ်ဆေးသုံးပီးထဲကမျက်နှာက ကြည်ပီး glow လာတာ တော်တော် အဆင်ပြေပီး ဈေးလဲ တော်တယ်ဈေးလဲ တော်တယ်",
         sentiment: "positive",
         confidence: 0.95,
       },
       {
-        text: "ဒီခေါင်းလျှော်ရည်လေး ဘယ်မှာဝယ်လို့ရမလဲရှင့် ညွှန်းပေးပါအုံးရှင",
+        text: "ဒီခေါင်းလျှော်ရည်လေး ဘယ်မှာဝယ်လို့ရမလဲရှင့် ညွှန်းပေးပါအုံး",
         sentiment: "neutral",
-        confidence: 0.65,
+        confidence: 0.45,
       },
       {
         text: "I hate waiting for updates.",
@@ -25,6 +25,8 @@ export default function DashboardPage() {
         confidence: 0.85,
       },
     ];
+  const noCase =
+    "<b>No results yet!</b><br> Upload a file or paste text in the 'File Upload' tab to see sentiment analysis results here</br > ";
     return (
       <>
         <div className="mx-3 py-5 flex justify-between">
@@ -46,7 +48,7 @@ export default function DashboardPage() {
           </div>
         </div>
             <div>
-                <DataTable columns={sentimentColumns} data={sentimentData} />
+                <DataTable columns={sentimentColumns} data={sentimentData} noCase={noCase} />
         </div>
       </>
     );
