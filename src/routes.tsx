@@ -8,6 +8,8 @@ import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
 import ApiServicesPage from "@/pages/apiservices/ApiServicesPage";
 import UniversalErrorPage  from "@/pages/ErrorPage/UniversalErrorPage";
+import DashboardPage from "@/pages/dashboardPage/dashboardpage";
+
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +22,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
+        element: <DashboardPage />,
       },
       {
         path: "/apiservices",
