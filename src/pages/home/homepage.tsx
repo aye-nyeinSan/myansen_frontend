@@ -79,13 +79,7 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
     // Simulate an API call
     await callAPI({ text:content, uploadedFiles: fileContents});
 
-    if (isLoading) {
-      toast({
-        title: "Processing",
-        description: "Please wait while we analyze your content.",
-      });
-      return;
-    }
+    // Removed redundant `if (isLoading)` check.
     
     setTimeout(() => {
       setIsLoading(false);
