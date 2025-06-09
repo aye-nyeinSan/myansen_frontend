@@ -14,6 +14,21 @@ export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  //Function to handle file contents within multiple files 
+const handlefileConents = async (files: File[]): Promise<string[]> => {
+  const readFile = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("File reading failed"));
+      reader.readAsText(file);
+    });
+  };
+
+  const fileReadPromises = files.map(readFile);
+  return Promise.all(fileReadPromises); 
+};
+
   //Calling backend API Function
   const callAPI = async (data: any) => { 
     console.log("Calling API with data:", data);
@@ -42,12 +57,13 @@ export default function HomePage() {
     }
   }
 
-  const handleAnalyze = () => { 
+  const handleAnalyze = async () => { 
     setIsLoading(true);
 
   // Validate content and files
   if (!content && files.length === 0) {
     toast({
+      className: "w-[400px] text-left",
       variant: "destructive",
       title: "No content provided",
       description: "Please enter text or upload files to analyze.",
@@ -55,8 +71,13 @@ export default function HomePage() {
     setIsLoading(false);
     return;
   }
+   let fileContents: string[] = [];
+      if (files.length > 0) {
+        fileContents = await handlefileConents(files); 
+      }
+    
     // Simulate an API call
-    callAPI({ text:content, uploadedFiles: files });
+    await callAPI({ text:content, uploadedFiles: fileContents});
 
     if (isLoading) {
       toast({
