@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
       }
       return pages;
     } else {
-      console.log("Current Page:", currentPage);
+// Removed unnecessary console.log statement
 
       const startPage = Math.max(1, currentPage - 1); //1
       const endPage = Math.min(totalPages, startPage + maxPage - 1); //3
