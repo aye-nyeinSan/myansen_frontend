@@ -3,55 +3,12 @@ import { DataTable } from "@/components/DataTable";
 import { icons } from "@/components/icons";
 import { sentimentColumns } from "@/components/sentimentColumns";
 import { type SentimentColumn } from "@/types/sentimentColums";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import { useState } from "react";
-import { set } from "react-hook-form";
+
 
 
 export default function DashboardPage() { 
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Number of items to display per page
-  const [totalPages, setTotalPages] = useState(0); 
-  
-  
-  //Function for changing page number
-  const handlePageChange = (page: number) => { 
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    } else 
-      setCurrentPage(1); 
-  }
-
-  const displayPage = () => {
-
-    const pages = [];
-    const maxPages = Math.ceil(sentimentData.length / itemsPerPage);
-
-    for (let i = 1; i <= maxPages; i++) {
-      pages.push(i);
-    }
-    return pages;
-
-  }
-  const itemsToDisplay = (sentimentData: SentimentColumn[]) => {
-    if (sentimentData && sentimentData.length <= itemsPerPage) {
-      return sentimentData;
-    }
-    else {
-      const startIndex = (currentPage - 1) * itemsPerPage; //0
-      const endIndex = startIndex + itemsPerPage;//3
-      return sentimentData.slice(startIndex, endIndex);//(0,3) => [1,2]
-    }
-  }
 
     // Mock data for sentiment analysis
     const sentimentData: SentimentColumn[] = [
@@ -183,47 +140,9 @@ export default function DashboardPage() {
         <div>
           <DataTable
             columns={sentimentColumns}
-            data={itemsToDisplay(sentimentData)}
+            data={sentimentData}
             noCase={noCase}
           />
-          <Pagination className="mt-5 flex justify-end">
-            <PaginationContent className="flex">
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  className={
-                    currentPage == 1 ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
-              
-              {displayPage().map((page, index) => {
-                return (
-                  <PaginationItem>
-                    <PaginationLink isActive={page == currentPage} href="#" key={index}>
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-             
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  className={
-                    currentPage == totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
         </div>
       </>
     );
