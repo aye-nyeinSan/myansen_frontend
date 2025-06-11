@@ -28,17 +28,18 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   noCase?: string; // Optional prop for no data case
+  itemsPerPage?: number; 
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   noCase = "No data available", 
+  itemsPerPage = 3, // Default items per page
 }: DataTableProps<TData, TValue>) {
 
   //Pagination State
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Number of items to display per page
   const totalPages = Math.ceil(data.length / itemsPerPage);
  
   //Slice the data for pagination

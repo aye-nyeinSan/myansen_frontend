@@ -142,6 +142,7 @@ export default function DashboardPage() {
             columns={sentimentColumns}
             data={sentimentData}
             noCase={noCase}
+            itemsPerPage={3}
           />
         </div>
       </>
