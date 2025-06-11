@@ -152,7 +152,6 @@ export function DataTable<TData, TValue>({
         <PaginationContent className="flex">
           <PaginationItem>
             <PaginationPrevious
-              as="button"
               onClick={() => {
                 handlePageChange(currentPage - 1);
               }}
