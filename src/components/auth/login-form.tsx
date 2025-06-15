@@ -19,12 +19,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-=======
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
->>>>>>> ebc5275f0c4c6b495ca12900d7b094aeea1cad06
 
 // Validation schema
 const loginSchema = z.object({
@@ -69,8 +66,6 @@ export function LoginForm({
 
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("token_type", data.token_type);
-<<<<<<< HEAD
-=======
 
 
       //fetch user profile with token
@@ -94,7 +89,6 @@ export function LoginForm({
       localStorage.setItem("user", JSON.stringify(normalizedUser));
       window.dispatchEvent(new Event("userChanged"));
 
->>>>>>> ebc5275f0c4c6b495ca12900d7b094aeea1cad06
       console.log("Login successful!");
       navigate("/");
     } catch (error: unknown) {
