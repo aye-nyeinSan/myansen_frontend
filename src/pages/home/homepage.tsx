@@ -48,13 +48,25 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
       console.log("API response:", result);
     }
     catch (error) {
-      console.error("API call failed:", error);
+      //console.error("API call failed:", error);
       toast({
         variant: "destructive",
         title: "API Call Failed",
         description: "An error occurred while processing your request.",
       });
     }
+  }
+  // Function to handle file deletion
+  const handleDeleteFile = (index: number) => { 
+    setFiles((prevFiles) => 
+      prevFiles.filter((_,i)=> i !== index));
+    toast({
+      className: "w-[400px] text-left",
+      variant: "default",
+      title: "File Deleted",
+      description: "The file has been successfully deleted.",
+    });
+
   }
 
   const handleAnalyze = async () => { 
@@ -119,6 +131,7 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
               accept={{ "text/csv": [".csv"], "text/plain": [".txt"] }}
               maxSize={10 * 1024 * 1024} // 10 MB
               initialFiles={files}
+              onDeletedfile={handleDeleteFile}
               onDropAccepted={(acceptedFiles) => {
                 acceptedFiles
                   .map((file) => file.name)
