@@ -10,6 +10,7 @@ import {
   type DropzoneProps as _DropzoneProps,
   type DropzoneState as _DropzoneState,
 } from "react-dropzone";
+import { on } from "events";
 
 export interface DropzoneState extends _DropzoneState {}
 
@@ -100,7 +101,7 @@ export interface DropzoneProps extends Omit<_DropzoneProps, "children"> {
   showFilesList?: boolean;
   showErrorMessage?: boolean;
   initialFiles?: File[];
-  onDeletedfile?: (index: number) => void;
+  onDeletedfile?: (index: number) => void | undefined;
 }
 
 const Dropzone = ({
@@ -140,7 +141,7 @@ const Dropzone = ({
 
   // Functions:
   const deleteUploadedFile = (index: number) => {
-    onDeletedfile(index); 
+    if (onDeletedfile) { onDeletedfile(index); }
      setFilesUploaded((_uploadedFiles) => [
        ..._uploadedFiles.slice(0, index),
        ..._uploadedFiles.slice(index + 1),
