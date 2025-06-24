@@ -4,6 +4,9 @@ import { Textarea } from "@/components/ui/textarea";
 import Dropzone from "@/components/ui/dropzone";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { LoaderCircle } from "lucide-react";
+import { Send } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 
@@ -95,70 +98,93 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
     
     setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 3000);
   }
 
   return (
     <>
-      <div className="grid w-full place-content-center gap-4 mt-8 mb-4">
-        <Tabs
-          defaultValue={activeTab}
-          className="w-[400px]"
-          onValueChange={(changeTab) => {
-            setActiveTab(changeTab);
-            if (changeTab === "textOnly") {
-              setFiles([]);
-            } else if (changeTab === "uploadFiles") {
-              setContent("");
-            }
-          }}
-        >
-          <TabsList>
-            <TabsTrigger value="textOnly">Enter Text</TabsTrigger>
-            <TabsTrigger value="uploadFiles">Upload File</TabsTrigger>
-          </TabsList>
-          <TabsContent value="textOnly">
-            <Textarea
-              className="w-full h-48"
-              placeholder="Type your message here."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-          </TabsContent>
-          <TabsContent value="uploadFiles">
-            <Dropzone
-              dropZoneClassName="h-48"
-              accept={{ "text/csv": [".csv"], "text/plain": [".txt"] }}
-              maxSize={10 * 1024 * 1024} // 10 MB
-              initialFiles={files}
-              onDeletedfile={handleDeleteFile}
-              onDropAccepted={(acceptedFiles) => {
-                acceptedFiles
-                  .map((file) => file.name)
-                  .join(", ");
-                setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+      {isLoading ? (
+        <>
+          <div className="flex flex-col gap-4 justify-center items-center mt-8 mb-4">
+            <div className="rounded-lg w-[400px] flex items-center place-content-center justify-center gap-2">
+              <Skeleton className="h-8 w-28" />
+              <Skeleton className="h-8 w-28" />
+            </div>
+            <div className="border-dashed border-2 border-gray-200 rounded-lg w-[400px] h-48 flex flex-col items-center place-content-center justify-center gap-2">
+              <Skeleton className="h-6 w-32" />
+              {/* For "Upload files" text/icon */}
+              <Skeleton className="h-4 w-48" />
+              {/* For "Max. file size: 10.00 MB" */}
+            </div>
+          </div>
+          <div className="flex  items-center justify-center m-7">
+            <LoaderCircle className="animate-spin h-6 w-6 text-black" />
+            <span className="ml-2 text-2xl">Analyzing...</span>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="grid w-full place-content-center gap-4 mt-8 mb-4">
+            <Tabs
+              defaultValue={activeTab}
+              className="w-[400px]"
+              onValueChange={(changeTab) => {
+                setActiveTab(changeTab);
+                if (changeTab === "textOnly") {
+                  setFiles([]);
+                } else if (changeTab === "uploadFiles") {
+                  setContent("");
+                }
               }}
-
-              onDropRejected={(fileRejections) => {
-                const errorMessage = fileRejections
-                  .map(
-                    (file) =>
-                      `File ${file.file.name} was rejected because it exceeds the maximum size.`
-                  )
-                  .join(" ");
-                toast({
-                  className: "w-[400px] text-left",
-                  variant: "destructive",
-                  title: "File Upload Error",
-                  description: errorMessage,
-                });
-              }}
-              disabled={isLoading}
-            />
-          </TabsContent>
-        </Tabs>
-      </div>
-      <Button onClick={handleAnalyze} className="mb-2">Analyze</Button>
+            >
+              <TabsList>
+                <TabsTrigger value="textOnly">Enter Text</TabsTrigger>
+                <TabsTrigger value="uploadFiles">Upload File</TabsTrigger>
+              </TabsList>
+              <TabsContent value="textOnly">
+                <Textarea
+                  className="w-full h-48"
+                  placeholder="Type your message here."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+              </TabsContent>
+              <TabsContent value="uploadFiles">
+                <Dropzone
+                  dropZoneClassName="h-48"
+                  accept={{ "text/csv": [".csv"], "text/plain": [".txt"] }}
+                  maxSize={10 * 1024 * 1024} // 10 MB
+                  initialFiles={files}
+                  onDeletedfile={handleDeleteFile}
+                  onDropAccepted={(acceptedFiles) => {
+                    acceptedFiles.map((file) => file.name).join(", ");
+                    setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+                  }}
+                  onDropRejected={(fileRejections) => {
+                    const errorMessage = fileRejections
+                      .map(
+                        (file) =>
+                          `File ${file.file.name} was rejected because it exceeds the maximum size.`
+                      )
+                      .join(" ");
+                    toast({
+                      className: "w-[400px] text-left",
+                      variant: "destructive",
+                      title: "File Upload Error",
+                      description: errorMessage,
+                    });
+                  }}
+                  disabled={isLoading}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+          <Button onClick={handleAnalyze} className="mb-2">
+            <Send />
+            Analyze
+          </Button>
+        </>
+      )}
     </>
   );
 }
