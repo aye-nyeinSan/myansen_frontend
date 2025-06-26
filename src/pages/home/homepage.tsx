@@ -7,11 +7,13 @@ import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
 import { Send } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
 
 
 
 export default function HomePage() {
   const { toast } = useToast();
+   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("textOnly");
   const [content, setContent] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
@@ -35,20 +37,36 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
   //Calling backend API Function
   const callAPI = async (data: any) => { 
     console.log("Calling API with data:", data);
-    try { 
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      console.log("No access token found. Redirecting to login.");
+      navigate("/login");
+       throw new Error("Authentication required.");
+    }
+    
+    try {
       const res = await fetch("http://127.0.0.1:8000/userinput", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
-
+if (res.status === 401) {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("user");
+  navigate("/login");
+  throw new Error(
+    "Unauthorized: Access token expired or invalid. Redirecting to login."
+  );
+}
       if (!res.ok) {
         throw new Error("Network response was not ok");
       }
       const result = await res.json();
       console.log("API response:", result);
+      
     }
     catch (error) {
       //console.error("API call failed:", error);
@@ -57,6 +75,7 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
         title: "API Call Failed",
         description: "An error occurred while processing your request.",
       });
+
     }
   }
   // Function to handle file deletion
@@ -68,34 +87,42 @@ const handlefileConents = async (files: File[]): Promise<string[]> => {
       variant: "default",
       title: "File Deleted",
       description: "The file has been successfully deleted.",
+      duration: 2000,
+    
     });
-
   }
 
-  const handleAnalyze = async () => { 
+  const handleAnalyze = async () => {
     setIsLoading(true);
 
-  // Validate content and files
-  if (!content && files.length === 0) {
-    toast({
-      className: "w-[400px] text-left",
-      variant: "destructive",
-      title: "No content provided",
-      description: "Please enter text or upload files to analyze.",
-    });
-    setIsLoading(false);
-    return;
-  }
-   let fileContents: string[] = [];
-      if (files.length > 0) {
-        fileContents = await handlefileConents(files); 
-      }
-    
+    // Validate content and files
+    if (!content && files.length === 0) {
+      toast({
+        className: "w-[400px] text-left",
+        variant: "destructive",
+        title: "No content provided",
+        description: "Please enter text or upload files to analyze.",
+        duration: 2000,
+      });
+      setIsLoading(false);
+      return;
+    }
+    let fileContents: string[] = [];
+    if (files.length > 0) {
+      fileContents = await handlefileConents(files);
+    }
+
+
     // Simulate an API call
-    await callAPI({ text:content, uploadedFiles: fileContents});
+    // Now, use the array of escaped strings in your data object
+    const data = {
+      text: content,
+      uploadedFiles: fileContents, 
+    };
+    await callAPI(data);
 
     // Removed redundant `if (isLoading)` check.
-    
+
     setTimeout(() => {
       setIsLoading(false);
     }, 3000);
