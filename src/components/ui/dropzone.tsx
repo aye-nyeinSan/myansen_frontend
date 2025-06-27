@@ -10,8 +10,6 @@ import {
   type DropzoneProps as _DropzoneProps,
   type DropzoneState as _DropzoneState,
 } from "react-dropzone";
-import { on } from "events";
-
 export interface DropzoneState extends _DropzoneState {}
 
 // Functions:
