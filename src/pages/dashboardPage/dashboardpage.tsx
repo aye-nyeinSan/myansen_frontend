@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/DataTable";
+
 import { icons } from "@/components/icons";
 import { sentimentColumns } from "@/components/ui/sentimentColumns";
 import { type SentimentColumn } from "@/types/sentimentColums";
@@ -95,6 +95,7 @@ export default function DashboardPage() {
 
   const noCase =
     "<b>No results yet!</b><br> Upload a file or paste text in the 'File Upload' tab to see sentiment analysis results here</br > ";
+
   return (
     <>
       <div className="mx-3 py-5 flex justify-between">
@@ -115,6 +116,7 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
       <div>
         <DataTable
           columns={sentimentColumns}
@@ -123,6 +125,8 @@ export default function DashboardPage() {
           itemsPerPage={3}
         />
       </div>
+
+
     </>
   );
 }
