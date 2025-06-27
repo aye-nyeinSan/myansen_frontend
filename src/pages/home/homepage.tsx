@@ -66,6 +66,9 @@ if (res.status === 401) {
       }
       const result = await res.json();
       console.log("API response:", result);
+      if (result) {
+        navigate('/dashboard',{state: {apiResponse: result} })
+      }
       
     }
     catch (error) {
