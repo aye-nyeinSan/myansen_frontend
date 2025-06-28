@@ -9,10 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 
 export const columns: ColumnDef<ApiKey>[] = [
   {
+    id: "key_name",
     accessorKey: "key_name",
     header: "Name",
   },
-  {
+  { id: "created",
     accessorKey: "created",
     header: "Created",
     // Add a custom cell renderer for date formatting
@@ -31,6 +32,7 @@ export const columns: ColumnDef<ApiKey>[] = [
     },
   },
   {
+    id: "lastUsed",
     accessorKey: "lastUsed",
     header: "Last Used",
     // Add a custom cell renderer for date formatting

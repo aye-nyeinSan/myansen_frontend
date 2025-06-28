@@ -7,19 +7,17 @@ import { ApiKey } from "@/types/ApiKey";
 import { ToastAction } from "@/components/ui/toast"; 
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { set } from "react-hook-form";
 
 
 
 export default function ApiServicesPage() {
   const navigate = useNavigate();
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [apiKeys, setApiKeys] = useState([]);
   const [newKeyName, setNewKeyName] = useState<string>("");
   const { toast } = useToast();
   let tokenRef = useRef<string | null>(null);
   
-
-
-    
   
   const fetchApiKeys = async () => {
     tokenRef.current = localStorage.getItem("access_token");
@@ -27,9 +25,9 @@ export default function ApiServicesPage() {
     if (!tokenRef) {
       console.log("No access token found. Redirecting to login.");
       navigate("/login");
+      setApiKeys([]);
       throw new Error("Authentication required.");
     }
-    //Mock data for API key table
        const res = await fetch("http://127.0.0.1:8000/api_key", {
          method: "GET",
          headers: {
@@ -37,6 +35,9 @@ export default function ApiServicesPage() {
            Authorization: `Bearer ${tokenRef.current}`,
          },
        });
+    const data = await res.json();
+    console.log(">>>>fetch API from DB  frontend function:",data.data);
+    
       if (res.status === 401) {
         localStorage.removeItem("access_token");
         localStorage.removeItem("user");
@@ -46,7 +47,7 @@ export default function ApiServicesPage() {
         );
       }
     console.log(">>>>fetch API from DB :",res)
-    setApiKeys([]);
+    setApiKeys(data.data);
   };
 
   useEffect(() => {
