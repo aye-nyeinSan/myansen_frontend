@@ -53,8 +53,11 @@ export const columns: ColumnDef<ApiKey>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => {
-      const apiKey = row.original;
+    cell: (props) => {
+      const apiKey = props.row.original;
+      const onApiKeysUpdated = (
+        props.table.options.meta as { onApiKeysUpdated: () => Promise<void> }
+      ).onApiKeysUpdated;
       console.log(">>>API Key Row Data:", apiKey);
 
       const data = {
@@ -104,6 +107,13 @@ export const columns: ColumnDef<ApiKey>[] = [
                description: "API Key is deleted.",
                duration: 2000,
              });
+             if (onApiKeysUpdated) {
+               await onApiKeysUpdated();
+             } else {
+               console.warn(
+                 "onApiKeysUpdated function not available in DataTable column meta."
+               );
+             }
             
           } else {
             console.error("Failed to revoke API key:", res.statusText);
@@ -118,7 +128,13 @@ export const columns: ColumnDef<ApiKey>[] = [
           
         } catch (error) {
           console.error("Error revoking API key:", error);
-          toast.error("Error revoking API key: " );
+           toast({
+             className: "w-[400px] text-left",
+             variant: "destructive",
+             title: "API Key Revoke Failed!!",
+             description: "Failed to revoke API key. Please try again.",
+             duration: 2000,
+           });
         }
 
       };
