@@ -7,8 +7,6 @@ import { ApiKey } from "@/types/ApiKey";
 import { ToastAction } from "@/components/ui/toast"; 
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { set } from "react-hook-form";
-
 
 
 export default function ApiServicesPage() {
@@ -36,7 +34,7 @@ export default function ApiServicesPage() {
          },
        });
     const data = await res.json();
-    console.log(">>>>fetch API from DB  frontend function:",data.data);
+
     
       if (res.status === 401) {
         localStorage.removeItem("access_token");
@@ -98,7 +96,7 @@ export default function ApiServicesPage() {
 
   // Function to handle key generation (mocked)
   const handleGenerateKey = async () => {
-      const newKey: ApiKey = {
+      const newKey = {
         key_name: newKeyName,
       };
     // Logic to generate a new API key
@@ -115,7 +113,7 @@ export default function ApiServicesPage() {
     console.log("API Key generated");
   
     const response = await callAPI(newKey);
-     const result = await response.json();
+    const result = await response.json();
 
     console.log("Generated Key Response ", result);
     setApiKeys((prevKeys) => [...prevKeys, newKey]);
@@ -150,6 +148,7 @@ export default function ApiServicesPage() {
           data={apiKeys}
           noCase={"No Key Generated yet!"}
           itemsPerPage={3}
+          onFetchData={fetchApiKeys}
         />
       </div>
     </div>
