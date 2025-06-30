@@ -11,12 +11,13 @@ import { useNavigate } from "react-router-dom";
 
 export default function ApiServicesPage() {
   const navigate = useNavigate();
+  //const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [apiKeys, setApiKeys] = useState([]);
   const [newKeyName, setNewKeyName] = useState<string>("");
   const { toast } = useToast();
   let tokenRef = useRef<string | null>(null);
   
-  
+  //fetching all API keys from the backend
   const fetchApiKeys = async () => {
     tokenRef.current = localStorage.getItem("access_token");
 
@@ -44,8 +45,9 @@ export default function ApiServicesPage() {
           "Unauthorized: Access token expired or invalid. Redirecting to login."
         );
       }
-    console.log(">>>>fetch API from DB :",res)
+    console.log(">>>>fetch API from DB :",data)
     setApiKeys(data.data);
+    return data.data;
   };
 
   useEffect(() => {
@@ -98,6 +100,11 @@ export default function ApiServicesPage() {
   const handleGenerateKey = async () => {
       const newKey = {
         key_name: newKeyName,
+        public_key: "",
+        hash_key: "",
+        created_at: "",
+        last_used_at: null,
+        account_status: "",
       };
     // Logic to generate a new API key
      if (newKeyName.trim() === "") {
@@ -110,14 +117,44 @@ export default function ApiServicesPage() {
        });
        return;
      }
-    console.log("API Key generated");
   
-    const response = await callAPI(newKey);
-    const result = await response.json();
-
+    //call API to create new key
+    const res = await callAPI(newKey);
+    if (!res) {
+      throw new Error("No response received from the API.");
+    }
+    const result = await res.json();
     console.log("Generated Key Response ", result);
+ if (res.status == 409) {
+   toast({
+     variant: "destructive",
+     title: `Key name "${newKeyName}" already exists.`,
+     description: `Please choose a different name.`,
+     className: "w-96 text-justify",
+   });
+   return;
+ }
+    if (
+      !result ||
+      !result.data ||
+      !result.data.key_name 
+
+    ) {
+      toast({
+        variant: "destructive",
+        title: "API Key Creation Failed",
+        description: "Failed to create API key. Please try again.",
+        className: "w-96 text-justify",
+      });
+      return;
+    }
+   
+    // Update the new key with the response data
+    newKey.key_name = result.data.key_name;
+    console.log("New API Key Created:", result.data.key_name);
     setApiKeys((prevKeys) => [...prevKeys, newKey]);
     setNewKeyName("");
+   
     toast({
       title: "API Key Created",
       description: `New API key "${newKey.key_name}" has been created successfully.`,

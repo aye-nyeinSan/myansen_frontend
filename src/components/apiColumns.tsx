@@ -58,7 +58,7 @@ export const columns: ColumnDef<ApiKey>[] = [
       const onApiKeysUpdated = (
         props.table.options.meta as { onApiKeysUpdated: () => Promise<void> }
       ).onApiKeysUpdated;
-      console.log(">>>API Key Row Data:", apiKey);
+      
 
       const data = {
         key_name: apiKey.key_name,
