@@ -112,66 +112,103 @@ export default function HomePage() {
     });
   };
 
+  //Analyze text function
   const handleAnalyze = async () => {
     setIsLoading(true);
-    // console.log(breakMyanmarSyllables(content));
-    // console.log(countMyanmarSyllables(content));
-    if (isMyanmarText(content)) {
-      if (!content && files.length === 0) {
-        toast({
-          className: "w-[400px] text-left",
-          variant: "destructive",
-          title: "No content provided",
-          description: "Please enter text or upload files to analyze.",
-          duration: 2000,
-        });
-        setIsLoading(false);
-        return;
-      } else if (countMyanmarSyllables(content) > 100) {
-        toast({
-          className: "w-[400px] text-left",
-          variant: "destructive",
-          title: "Exceeds Content",
-          description: "Maximum Characters is 100",
-          duration: 2000,
-        });
-        setIsLoading(false);
-        return;
-      } else if (files.length > 20) {
-        toast({
-          className: "w-[400px] text-left",
-          variant: "destructive",
-          title: "Exceeds Content",
-          description: "“Too much files!System accepts maximum 20 files.",
-          duration: 2000,
-        });
-        setIsLoading(false);
-        return;
+    console.log(">>>> Break Myaname Syllables", breakMyanmarSyllables(content));
+    console.log(
+      ">>>> Count Myanmar Syllables:::",
+      countMyanmarSyllables(content)
+    );
+    if (!content && files.length === 0) {
+      toast({
+        className: "w-[400px] text-left",
+        variant: "destructive",
+        title: "No content provided",
+        description: "Please enter text or upload files to analyze.",
+        duration: 2000,
+      });
+      setIsLoading(false);
+      return;
+    }
+    let fileContents: string[] = [];
+    let analyzeContents: string[] = [];
+
+    //Check file contents is Myanmar text or not
+    if ((files.length > 0 && files.length <= 20) || content.length > 0) {
+      fileContents = await handlefileConents(files);
+      for (const fileContent of fileContents) {
+        console.log(">>File Content:", fileContent);
+        console.log(">>>isMyanmarText:", isMyanmarText(fileContent));
+
+        if (!isMyanmarText(fileContent)) {
+          toast({
+            className: "w-[400px] text-left",
+            variant: "destructive",
+            title: "Language Unavailable",
+            description: "Please Enter only Myanmar text in files",
+            duration: 2000,
+          });
+          setIsLoading(false);
+          return;
+        } else {
+          analyzeContents.push(fileContent);
+        }
       }
+      console.log(">>>End of File Content");
+      //Call API
     } else {
       toast({
         className: "w-[400px] text-left",
         variant: "destructive",
-        title: "Language Unavailable",
-        description: "Please Enter only Myanmar text",
+        title: "Exceeds Content",
+        description: "“Too much files!System accepts maximum 20 files.",
         duration: 2000,
       });
       setIsLoading(false);
       return;
     }
 
-    let fileContents: string[] = [];
-    if (files.length > 0) {
-      fileContents = await handlefileConents(files);
+    //Check text content is Myanmar text or not
+    if (content) {
+      if (isMyanmarText(content)) {
+        //count Myanmar syllables
+        if (countMyanmarSyllables(content) > 100) {
+          toast({
+            className: "w-[400px] text-left",
+            variant: "destructive",
+            title: "Exceeds Content",
+            description: "Maximum Characters is 100",
+            duration: 2000,
+          });
+          setIsLoading(false);
+          return;
+        } else {
+          setContent(content.trim());
+        }
+      } else {
+        toast({
+          className: "w-[400px] text-left",
+          variant: "destructive",
+          title: "Language Unavailable",
+          description: "Please Enter only Myanmar text",
+          duration: 2000,
+        });
+        setIsLoading(false);
+        return;
+      }
     }
 
+    // Prepare data for API call
     const data = {
       text: content,
-      uploadedFiles: fileContents,
+      uploadedFiles: analyzeContents,
     };
+    console.log(">>>Data to be sent to API:", data);
 
+    //Input API call
     await callAPI(data);
-    setTimeout(() => setIsLoading(false), 3000);
+    setIsLoading(false);
   };
 
   return (
