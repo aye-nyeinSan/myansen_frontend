@@ -138,7 +138,7 @@ export default function HomePage() {
     if ((files.length > 0 && files.length <= 20) || content.length > 0) {
       fileContents = await handlefileConents(files);
       for (const fileContent of fileContents) {
-        console.log(">>File Content:", fileContent);
+        // console.log(">>File Content:", fileContent);
         console.log(">>>isMyanmarText:", isMyanmarText(fileContent));
 
         if (!isMyanmarText(fileContent)) {
