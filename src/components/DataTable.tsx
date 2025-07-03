@@ -159,7 +159,8 @@ export function DataTable<TData, TValue>({
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   handlePageChange(currentPage - 1);
                 }}
                 className={
@@ -171,7 +172,8 @@ export function DataTable<TData, TValue>({
               <PaginationItem key={page}>
                 <PaginationLink
                   href="#"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     handlePageChange(page);
                   }}
                   className={
@@ -191,7 +193,8 @@ export function DataTable<TData, TValue>({
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   handlePageChange(currentPage + 1);
                 }}
                 className={
