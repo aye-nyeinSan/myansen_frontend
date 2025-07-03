@@ -4,11 +4,9 @@ import { Textarea } from "@/components/ui/textarea";
 import Dropzone from "@/components/ui/dropzone";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-
 import { LoaderCircle, Send } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
-
 import {
   breakMyanmarSyllables,
   countMyanmarSyllables,
@@ -18,7 +16,6 @@ import { isMyanmarText } from "@/utils/checkMyanmar";
 export default function HomePage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-
   const tokenRef = useRef<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<string>("textOnly");
@@ -45,7 +42,8 @@ export default function HomePage() {
     const fileReadPromises = files.map(readFile);
     return Promise.all(fileReadPromises);
   };
-
+  
+  //user input API call
   const callAPI = async (data: any) => {
     const token = tokenRef.current;
 
@@ -83,7 +81,7 @@ export default function HomePage() {
       }
 
       const result = await res.json();
-      console.log("API response:", result);
+      console.log(">>> API response:", result);
 
       if (token) {
         navigate("/dashboard", { state: { apiResponse: result } });

@@ -170,7 +170,7 @@ export function DataTable<TData, TValue>({
           {displayPage().map((page) => (
             <PaginationItem key={page}>
               <PaginationLink
-                href=""
+                href="#"
                 onClick={() => {
                   handlePageChange(page);
                 }}
