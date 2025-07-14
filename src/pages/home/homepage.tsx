@@ -225,7 +225,7 @@ export default function HomePage() {
           </div>
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <p className="text-white text-3xl md:text-5xl font-medium">
-             <LoaderCircle></LoaderCircle>  Analyzing...
+             <LoaderCircle className="animate-spin h-6 w-6 "/> Analyzing...
             </p>
           </div>
         </div>
