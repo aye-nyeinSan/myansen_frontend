@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle, Send } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+
 import { useNavigate } from "react-router-dom";
 import {
   breakMyanmarSyllables,
@@ -222,9 +223,10 @@ export default function HomePage() {
             <Skeleton className="h-6 w-32" />
             <Skeleton className="h-4 w-48" />
           </div>
-          <div className="flex items-center justify-center m-7">
-            <LoaderCircle className="animate-spin h-6 w-6 text-black" />
-            <span className="ml-2 text-2xl">Analyzing...</span>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <p className="text-white text-3xl md:text-5xl font-medium">
+             <LoaderCircle></LoaderCircle>  Analyzing...
+            </p>
           </div>
         </div>
       ) : (
