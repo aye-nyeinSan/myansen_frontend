@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle, Send } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-
 import { useNavigate } from "react-router-dom";
 import {
   breakMyanmarSyllables,
