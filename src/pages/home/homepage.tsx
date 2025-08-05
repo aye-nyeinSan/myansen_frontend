@@ -223,9 +223,10 @@ export default function HomePage() {
             <Skeleton className="h-6 w-32" />
             <Skeleton className="h-4 w-48" />
           </div>
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <p className="text-white text-3xl md:text-5xl font-medium">
-             <LoaderCircle className="animate-spin h-6 w-6 "/> Analyzing...
+          <div className="fixed inset-0 z-50 flex items-center gap-2 justify-center bg-black/60 backdrop-blur-sm">
+            <LoaderCircle className="animate-spin text-white h-10 w-10 " />
+            <p className="text-white text-2xl md:text-5xl font-medium">
+              Analyzing...
             </p>
           </div>
         </div>
