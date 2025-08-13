@@ -5,6 +5,7 @@ import { sentimentColumns } from "@/components/ui/sentimentColumns";
 import { type SentimentColumn } from "@/types/sentimentColums";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
+import { uploadDatasetToS3 } from "@/utils/modelPipeline";
 
 export default function DashboardPage() {
   const location = useLocation();
@@ -102,6 +103,8 @@ export default function DashboardPage() {
   const noCase =
     "<b>No results yet!</b><br> Upload a file or paste text in the 'File Upload' tab to see sentiment analysis results here</br > ";
 
+
+
   return (
     <>
       <div className="mx-3 py-5 flex justify-between">
@@ -116,9 +119,11 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             className="outline text-teal-600 hover:bg-teal-600 hover:text-white ml-4"
+            onClick={() => uploadDatasetToS3()}
           >
             <icons.loop className="mr-2" />
             Retrain Model
+           
           </Button>
         </div>
       </div>
