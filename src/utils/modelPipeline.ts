@@ -1,10 +1,28 @@
-import { PreSignPutObjResponse } from "@/types/AWS";
+import { PreSignPutObjResponse, MakeDataSet,TriggerModelRequest } from "@/types/AWS";
+import { v4 as uuidv4 } from "uuid";
+
+
+
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 const API_VERSION = "/api/v1/"
 
+//get text and feeback to make dataset
+export  async function makeDatasetToUpload(formattedData: MakeDataSet[]){
 
+  //making formatted dataset into csv file 
+  const headerRows = ["text","label"]
+  const rows = formattedData.map((item)=>[item.text,item.feedback])
+  const csvStrings = [headerRows, ...rows].map((row)=>row.map(val => `${val}`).join(",")).join("/n");  
+  const DataSetName = `${JSON.parse(localStorage.getItem('user')?? 'undefined').email}+${new Date().toISOString()}+${uuidv4()}`;
+
+  const formattedFile: File = new File([csvStrings], DataSetName ,{type: "text/csv"});
+
+  return formattedFile;
+
+
+}
 async function fetchPresignedUrl(file: File): Promise<PreSignPutObjResponse> { 
     const url = new URL(`${API_BASE_URL}${API_VERSION}upload/presigned_url`);
     console.log(">> Calling URL:", url.toString());
@@ -27,22 +45,28 @@ async function fetchPresignedUrl(file: File): Promise<PreSignPutObjResponse> {
     const data: PreSignPutObjResponse = await presign_url.json();
    return data; 
 }
+
+
 export async function uploadDatasetToS3(file?: File) {
     console.log("Upload to S3 clicked - implement your logic here");
-    const f = file ?? new File(["hello"], "dummy.txt", { type: "text/plain" });
-
-    const { url, key, bucket }: PreSignPutObjResponse = await fetchPresignedUrl(f);
+    console.log(">>> uploaded file:", file)
+    if (!file){
+       new Error("No file existed to upload!")
+       return;
+    }
+    
+    const { url, key, bucket }: PreSignPutObjResponse = await fetchPresignedUrl(file);
     
     //put file to S3
     const uploadtoS3 = await fetch(url, {
       method: "PUT",
-      body: f,
+      body: file,
       headers: {
-        "Content-Type": f.type || "application/octet-stream",
+        "Content-Type": file.type || "application/octet-stream",
       },
     });
     if (uploadtoS3.ok)
-    { console.log("Uploaded! S3 key:"); }
+    { console.log("Uploaded!"); }
     else {
         const errText = await uploadtoS3.text();
         console.error("S3 PUT error:", errText);
@@ -52,4 +76,26 @@ export async function uploadDatasetToS3(file?: File) {
     }
     
     return { key, bucket };
+}
+
+export async function TriggerModelTrainingNotebook(s3Data: TriggerModelRequest){
+
+ const triggerResult= await fetch("http://127.0.0.1:8000/retrainmodel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(s3Data)
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error retraining model:", error);
+        });
+      
+      return triggerResult
 }

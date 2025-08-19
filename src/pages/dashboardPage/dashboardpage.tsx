@@ -5,20 +5,40 @@ import { sentimentColumns } from "@/components/ui/sentimentColumns";
 import { type SentimentColumn } from "@/types/sentimentColums";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
-import { uploadDatasetToS3 } from "@/utils/modelPipeline";
+import { uploadDatasetToS3 , makeDatasetToUpload , TriggerModelTrainingNotebook} from "@/utils/modelPipeline";
+import { MakeDataSet } from "@/types/AWS";
 
-export default function DashboardPage() {
-  const location = useLocation();
 
-  const apiResponse: any[] = useMemo(
-    () => location.state?.apiResponse?.results || [],
-    [location.state]
-  );
 
-  const [sentimentColumnsData, setSentimentColumnsData] = useState<
-    SentimentColumn[]
-  >([]);
+async function processUploadingDataSetToS3(sentimentColumnsData: SentimentColumn[]) {
+    // 1.make formatted dataset 
+    const formattedDataSet: MakeDataSet[] = sentimentColumnsData
+         .map((item) => ({
+           text: item.text,
+           feedback: item.feedback?.type as "positive" | "neutral" | "negative",
+         }));
+    const afterFormatted =  await makeDatasetToUpload(formattedDataSet);
 
+     if(!afterFormatted) {
+      return {message: " There is no dataset to upload! "}
+     }
+
+    // 2.upload the dataset to s3
+    const afterUploadResult = await uploadDatasetToS3(afterFormatted);
+      if(!afterUploadResult) {
+      return {message: " There is no upload result! "}
+     }
+
+    //3. trigger backend api with s3 key and bucket
+     const afterTriggerResult = await TriggerModelTrainingNotebook(afterUploadResult);
+     if(!afterTriggerResult) {
+      return {message: " There is no after trigger result! "}
+     }
+     console.log(">>>> After Trigger Result:", afterTriggerResult);
+     
+    return afterTriggerResult;
+
+  }
   async function fetchSentimentResultsForUser() {
     const token = localStorage.getItem("access_token");
 
@@ -49,6 +69,20 @@ export default function DashboardPage() {
       return null;
     }
   }
+
+export default function DashboardPage() {
+  const location = useLocation();
+
+  const apiResponse: any[] = useMemo(
+    () => location.state?.apiResponse?.results || [],
+    [location.state]
+  );
+
+  const [sentimentColumnsData, setSentimentColumnsData] = useState<
+    SentimentColumn[]
+  >([]);
+
+
 
   // Function to fetch all sentiment results for the user from DB
   const loadData = async () => {
@@ -104,10 +138,21 @@ export default function DashboardPage() {
     "<b>No results yet!</b><br> Upload a file or paste text in the 'File Upload' tab to see sentiment analysis results here</br > ";
 
 
+  
 
   return (
     <>
       <div className="mx-3 py-5 flex justify-between">
+        {/* <pre>
+          {JSON.stringify(
+            sentimentColumnsData.map((item) => ({
+              text: item.text,
+              feedback: item.feedback?.type,
+            })),
+            null,
+            2
+          )}
+        </pre> */}
         <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
           Sentiment Dashboard
         </h2>
@@ -119,7 +164,7 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             className="outline text-teal-600 hover:bg-teal-600 hover:text-white ml-4"
-            onClick={() => uploadDatasetToS3()}
+            onClick={()=> processUploadingDataSetToS3(sentimentColumnsData)}
           >
             <icons.loop className="mr-2" />
             Retrain Model
