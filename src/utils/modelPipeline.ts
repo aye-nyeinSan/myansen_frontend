@@ -14,7 +14,7 @@ export  async function makeDatasetToUpload(formattedData: MakeDataSet[]){
   //making formatted dataset into csv file 
   const headerRows = ["text","label"]
   const rows = formattedData.map((item)=>[item.text,item.feedback])
-  const csvStrings = [headerRows, ...rows].map((row)=>row.map(val => `${val}`).join(",")).join("/n");  
+  const csvStrings = [headerRows, ...rows].map((row)=>row.map(val => `"${val}"`).join(",")).join("\n");  
   const DataSetName = `${JSON.parse(localStorage.getItem('user')?? 'undefined').email}+${new Date().toISOString()}+${uuidv4()}`;
 
   const formattedFile: File = new File([csvStrings], DataSetName ,{type: "text/csv"});
