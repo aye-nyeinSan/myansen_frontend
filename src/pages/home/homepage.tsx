@@ -4,11 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import Dropzone from "@/components/ui/dropzone";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-
 import { LoaderCircle, Send } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useNavigate } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
 import {
   breakMyanmarSyllables,
   countMyanmarSyllables,
@@ -18,7 +17,6 @@ import { isMyanmarText } from "@/utils/checkMyanmar";
 export default function HomePage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-
   const tokenRef = useRef<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<string>("textOnly");
@@ -46,8 +44,10 @@ export default function HomePage() {
     return Promise.all(fileReadPromises);
   };
 
+  //user input API call
   const callAPI = async (data: any) => {
     const token = tokenRef.current;
+    console.log(">>> Token for API call:", token);
 
     try {
       const headers: HeadersInit = {
@@ -62,8 +62,10 @@ export default function HomePage() {
         headers,
         body: JSON.stringify(data),
       });
-
+      //unauthorized error handling
       if (res.status === 401) {
+        console.log(">>> Unauthorized access - token expired or invalid");
+        
         if (token) {
           localStorage.removeItem("access_token");
           localStorage.removeItem("user");
@@ -72,8 +74,10 @@ export default function HomePage() {
         } else {
           // Guest access - do not redirect
           const guestResult = await res.json();
-          localStorage.setItem("guest_result", JSON.stringify(guestResult));
-          navigate("/dashboard");
+          // localStorage.setItem("guest_result", JSON.stringify(guestResult));
+          console.log(">>> Guest API response:", guestResult);
+          
+          navigate("/dashboard", { state: { apiResponse: guestResult } });
           return;
         }
       }
@@ -83,17 +87,14 @@ export default function HomePage() {
       }
 
       const result = await res.json();
-      console.log("API response:", result);
-
-      if (token) {
-        navigate("/dashboard", { state: { apiResponse: result } });
-      } else {
-        localStorage.setItem("guest_result", JSON.stringify(result));
-        navigate("/dashboard");
-      }
+      console.log(">>> API response:", result);
+      navigate("/dashboard", { state: { apiResponse: result } });
+     
+      
     } catch (error) {
       console.error("API call failed:", error);
       toast({
+        className: "w-[400px] text-left",
         variant: "destructive",
         title: "API Call Failed",
         description: "An error occurred while processing your request.",
@@ -138,7 +139,9 @@ export default function HomePage() {
     if ((files.length > 0 && files.length <= 20) || content.length > 0) {
       fileContents = await handlefileConents(files);
       for (const fileContent of fileContents) {
-        console.log(">>File Content:", fileContent);
+
+        // console.log(">>File Content:", fileContent);
+
         console.log(">>>isMyanmarText:", isMyanmarText(fileContent));
 
         if (!isMyanmarText(fileContent)) {
@@ -223,9 +226,10 @@ export default function HomePage() {
             <Skeleton className="h-6 w-32" />
             <Skeleton className="h-4 w-48" />
           </div>
-          <div className="flex items-center justify-center m-7">
-            <LoaderCircle className="animate-spin h-6 w-6 text-black" />
-            <span className="ml-2 text-2xl">Analyzing...</span>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <p className="text-white text-3xl md:text-5xl font-medium">
+             <LoaderCircle className="animate-spin h-6 w-6 "/> Analyzing...
+            </p>
           </div>
         </div>
       ) : (
