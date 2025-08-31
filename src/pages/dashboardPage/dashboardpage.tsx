@@ -4,7 +4,7 @@ import { icons } from "@/components/icons";
 import { sentimentColumns } from "@/components/ui/sentimentColumns";
 import { type SentimentColumn } from "@/types/sentimentColums";
 import { useLocation } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   processUploadingDataSetToS3,
   fetchSentimentResultsForUser,
@@ -13,6 +13,8 @@ import {
 import { ProgressGame } from "@/components/ui/progress";
 import { handleExport } from "@/utils/exportFile";
 import { Badge } from "@/components/ui/badge";
+import { v4 as uuid } from "uuid";
+
 
 
 
@@ -63,6 +65,7 @@ export default function DashboardPage() {
       }
       //grab colums data
       const columnsData: SentimentColumn[] = rawData.map((item: any) => ({
+        id: item.id?.toString() ?? uuid(),
         text: item.text,
         sentiment:
           item.predicted_label?.toLowerCase?.() ??
@@ -91,28 +94,45 @@ export default function DashboardPage() {
 
  
   // Handle feedback submission from DataTable
-  const handleSubmitFeedback = (id: string, value: string) => {
+  const handleSubmitFeedback = useCallback((id: string, value: string) => {
     setSubmitedRowId(id);
     setCollectedFeedback((prev) => prev + 1)
-    console.log(">>> Updating feedback for row id:", id, "to value:", value);
- 
-}
+    setSentimentColumnsData((prevData) =>
+      prevData.map((item) =>      
+        item.id === id
+          ? { ...item, feedback: { type: value as "positive" | "neutral" | "negative" } }
+          : item
+      )
+    );
 
+    
+  }, []); 
+   
+  useEffect(() => {
+    console.log("SentimentColumnsData changed:", sentimentColumnsData);
+  }, [sentimentColumnsData]);
+
+ 
+const columns = useMemo(
+  () => sentimentColumns(handleSubmitFeedback),
+  [handleSubmitFeedback]
+);
   
 
   return (
     <>
       <div className="mx-3 py-5 flex justify-between">
-        {/* <pre>
+         {/* <pre>
           {JSON.stringify(
             sentimentColumnsData.map((item) => ({
+              id: item.id?.toString() ?? uuid(),
               text: item.text,
               feedback: item.feedback?.type,
             })),
             null,
             2
           )}
-        </pre> */}
+        </pre>  */}
         <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
           Sentiment Dashboard
         </h2>
@@ -128,7 +148,7 @@ export default function DashboardPage() {
             variant="outline"
             className="outline relative text-teal-600 hover:bg-teal-600 hover:text-white ml-4"
             onClick={() => processUploadingDataSetToS3(sentimentColumnsData)}
-            disabled={collectedFeedback <= targetFeedback}
+            disabled={collectedFeedback < targetFeedback}
           >
             <icons.loop className="mr-2" />
             Retrain Model
@@ -154,7 +174,7 @@ export default function DashboardPage() {
 
       <div>
         <DataTable
-          columns={sentimentColumns(handleSubmitFeedback)}
+          columns={columns}
           data={sentimentColumnsData}
           noCase={noCase}
           itemsPerPage={3}

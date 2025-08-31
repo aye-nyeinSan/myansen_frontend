@@ -9,6 +9,7 @@ import { FeedbackCell } from "@/components/FeedBackCell";
 
 
 
+
 export const sentimentColumns = (
   handleSubmitFeedback?: (rowId: string, value: string) => void
 ): ColumnDef<SentimentColumn>[] => [
@@ -23,7 +24,7 @@ export const sentimentColumns = (
 
       if (isLowConfidence) {
         return (
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start  ">
             <span className="text-black text-left text-wrap">
               {row.getValue("text")}
             </span>
@@ -94,7 +95,9 @@ export const sentimentColumns = (
     header: "Feedback",
     cell: ({ row }) => {
       const defaultValue = row.getValue("sentiment") as string;
-      const id = row.index.toString();
+      const id = row.original.id as string;
+  
+      
 
       return (
         <FeedbackCell
@@ -103,6 +106,7 @@ export const sentimentColumns = (
           onSubmit={(id, value) => {
             handleSubmitFeedback?.(id, value);
           }}
+          isLowConfidence={(row.getValue("confidence") as number) <= 0.6}
         />
       );
     },
