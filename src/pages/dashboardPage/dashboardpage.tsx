@@ -96,7 +96,7 @@ export default function DashboardPage() {
   // Handle feedback submission from DataTable
   const handleSubmitFeedback = useCallback((id: string, value: string) => {
     setSubmitedRowId(id);
-    setCollectedFeedback((prev) => prev + 1)
+    setCollectedFeedback((prev) => prev + 1);
     setSentimentColumnsData((prevData) =>
       prevData.map((item) =>      
         item.id === id
