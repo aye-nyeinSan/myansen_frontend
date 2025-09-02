@@ -63,7 +63,7 @@ export async function fetchSentimentResultsForUser() {
       return null;
     }
 
-    return res.json();
+    return await res.json();
   } catch (err) {
     console.error("Error fetching user data:", err);
     return null;
