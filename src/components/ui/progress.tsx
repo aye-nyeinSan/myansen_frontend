@@ -3,9 +3,6 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "@/lib/utils";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-const App = () => {
-  return <DotLottieReact src="path/to/animation.lottie" loop autoplay />;
-};
 
 type ProgressGameProps = React.ComponentPropsWithoutRef<
   typeof ProgressPrimitive.Root
