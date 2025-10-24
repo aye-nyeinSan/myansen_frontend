@@ -30,8 +30,10 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { User } from "@/types/User";
 import { v4 as uuid } from "uuid";
+import { LoaderCircle } from "lucide-react";
 
 export default function DashboardPage() {
+  const [loading, setLoading] = useState<boolean>(false);
   const location = useLocation();
   const [collectedFeedback, setCollectedFeedback] = useState(0);
   const [submitedRowId, setSubmitedRowId] = useState<string | null>(null);
@@ -145,19 +147,21 @@ export default function DashboardPage() {
     selectedType === "positive"
       ? getWordFrequencies(positiveText)
       : selectedType === "negative"
-      ? getWordFrequencies(negativeText)
-      : getWordFrequencies(neutralText);
+        ? getWordFrequencies(negativeText)
+        : getWordFrequencies(neutralText);
 
   const handleSubmitFeedback = useCallback((id: string, value: string) => {
+    console.log("value from handlesubmitfeedback=>",value);
+    
     setSubmitedRowId(id);
     setCollectedFeedback((prev) => prev + 1);
     setSentimentColumnsData((prevData) =>
       prevData.map((item) =>
         item.id === id
           ? {
-              ...item,
-              feedback: { type: value as "positive" | "neutral" | "negative" },
-            }
+            ...item,
+            feedback: { type: value as "positive" | "neutral" | "negative" },
+          }
           : item
       )
     );
@@ -170,121 +174,142 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="mx-3 py-5 flex justify-between">
-        <h2 className="text-3xl font-semibold tracking-tight">
-          Sentiment Dashboard
-        </h2>
+      {loading ? (
+        <div className="flex flex-col gap-4 justify-center items-center mt-8 mb-4">
+         
+          <div className="fixed inset-0 z-50 flex items-center gap-2 justify-center bg-black/60 backdrop-blur-sm">
+            <LoaderCircle className="animate-spin text-white h-10 w-10 " />
+            <p className="text-white text-2xl md:text-5xl font-medium">
+              Analyzing...
+            </p>
+          </div>
+        </div>
+      ) : (
         <div>
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="bg-teal-700 text-white hover:bg-teal-600">
-                  <icons.export className="mr-2 h-4 w-4" />
-                  Export Data
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                sideOffset={5}
-                className="w-48 rounded-xl shadow-lg border border-gray-200 bg-white"
-              >
-                <DropdownMenuItem
-                  className="cursor-pointer flex items-center px-3 py-1 rounded-md hover:bg-teal-50 focus:bg-teal-100"
-                  onClick={() => handleExportCSV(sentimentColumnsData)}
-                >
-                  Export as CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer flex items-center px-3 py-1 rounded-md hover:bg-teal-50 focus:bg-teal-100"
-                  onClick={() => handleExportExcel(sentimentColumnsData)}
-                >
-                  Export as Excel
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          <Button
-            variant="outline"
-            className="outline relative text-teal-600 hover:bg-teal-600 hover:text-white ml-4"
-            onClick={() => processUploadingDataSetToS3(sentimentColumnsData)}
-            disabled={collectedFeedback < targetFeedback}
-          >
-            <icons.loop className="mr-2" />
-            Retrain Model
-            {collectedFeedback >= targetFeedback && (
-              <Badge className="h-3 min-w-3 rounded-full px-1 font-mono tabular-nums bg-red-600 border-red-600  animate-pulse pointer-events-none absolute right-0 top-0 -translate-x-1/2 -translate-y-1/2 "></Badge>
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Progress for feedback collection */}
-      <div className="mx-3 mb-4 bg-[#e5fffc] items-center p-2 px-5 pt-3 rounded-xl">
-        <div className="flex justify-between">
-          <h4 className="mb-1">Feedback collected: {collectedFeedback}</h4>
-          <small>Goal: {targetFeedback}</small>
-        </div>
-        <ProgressGame
-          value={progress}
-          className="mb-5 w-[100%]"
-          showPercent={false}
-          targetGoal={targetFeedback}
-          customMaker={"🥳"}
-        />
-      </div>
-      <DataTable
-        columns={columns}
-        data={sentimentColumnsData}
-        noCase={noCase}
-        itemsPerPage={3}
-      />
-      <div className="mx-3 py-5">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-teal-700 text-white hover:bg-teal-600">
-              View Wordclouds
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-xl max-h-2xl">
-            <DialogHeader>
-              <DialogTitle>Wordcloud Viewer</DialogTitle>
-              <div className="pt-4">
-                <div className="mb-4 flex items-center gap-2">
-                  <label className="font-medium" htmlFor="type">
-                    Select Sentiment:
-                  </label>
-                  <select
-                    id="type"
-                    value={selectedType}
-                    onChange={(e) =>
-                      setSelectedType(
-                        e.target.value as "positive" | "negative" | "neutral"
-                      )
-                    }
-                    className="border border-gray-300 rounded px-2 py-1"
+          <div className="mx-3 py-5 flex justify-between">
+            <h2 className="text-3xl font-semibold tracking-tight">
+              Sentiment Dashboard
+            </h2>
+            <div>
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-teal-700 text-white hover:bg-teal-600">
+                      <icons.export className="mr-2 h-4 w-4" />
+                      Export Data
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={5}
+                    className="w-48 rounded-xl shadow-lg border border-gray-200 bg-white"
                   >
-                    <option value="positive">Positive</option>
-                    <option value="negative">Negative</option>
-                    <option value="neutral">Neutral</option>
-                  </select>
-                </div>
+                    <DropdownMenuItem
+                      className="cursor-pointer flex items-center px-3 py-1 rounded-md hover:bg-teal-50 focus:bg-teal-100"
+                      onClick={() => handleExportCSV(sentimentColumnsData)}
+                    >
+                      Export as CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer flex items-center px-3 py-1 rounded-md hover:bg-teal-50 focus:bg-teal-100"
+                      onClick={() => handleExportExcel(sentimentColumnsData)}
+                    >
+                      Export as Excel
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
-
-                {wordFreq.length > 0 ? (
-                  <div className="w-full h-[60vh] flex items-center justify-center bg-gray-50 rounded-lg shadow-inner">
-                    <WordCloudSVG words={wordFreq} />
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    No data to display for this sentiment.
-                  </p>
+              <Button
+                variant="outline"
+                className="outline relative text-teal-600 hover:bg-teal-600 hover:text-white ml-4"
+                  onClick={() => {
+                    setLoading(true);
+                    processUploadingDataSetToS3(sentimentColumnsData)
+                      .then(() => setLoading(false))
+                  }
+                }
+                disabled={collectedFeedback < targetFeedback}
+              >
+                <icons.loop className="mr-2" />
+                Retrain Model
+                {collectedFeedback >= targetFeedback && (
+                  <Badge className="h-3 min-w-3 rounded-full px-1 font-mono tabular-nums bg-red-600 border-red-600  animate-pulse pointer-events-none absolute right-0 top-0 -translate-x-1/2 -translate-y-1/2 "></Badge>
                 )}
-              </div>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-      </div>
+              </Button>
+            </div>
+          </div>
+
+          {/* Progress for feedback collection */}
+          <div className="mx-3 mb-4 bg-[#e5fffc] items-center p-2 px-5 pt-3 rounded-xl">
+            <div className="flex justify-between">
+              <h4 className="mb-1">Feedback collected: {collectedFeedback}</h4>
+              <small>Goal: {targetFeedback}</small>
+            </div>
+            <ProgressGame
+              value={progress}
+              className="mb-5 w-[100%]"
+              showPercent={false}
+              targetGoal={targetFeedback}
+              customMaker={"🥳"}
+            />
+          </div>
+          <DataTable
+            columns={columns}
+            data={sentimentColumnsData}
+            noCase={noCase}
+            itemsPerPage={3}
+          />
+          <div className="mx-3 py-5">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-teal-700 text-white hover:bg-teal-600">
+                  View Wordclouds
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-xl max-h-2xl">
+                <DialogHeader>
+                  <DialogTitle>Wordcloud Viewer</DialogTitle>
+                  <div className="pt-4">
+                    <div className="mb-4 flex items-center gap-2">
+                      <label className="font-medium" htmlFor="type">
+                        Select Sentiment:
+                      </label>
+                      <select
+                        id="type"
+                        value={selectedType}
+                        onChange={(e) =>
+                          setSelectedType(
+                            e.target.value as
+                              | "positive"
+                              | "negative"
+                              | "neutral"
+                          )
+                        }
+                        className="border border-gray-300 rounded px-2 py-1"
+                      >
+                        <option value="positive">Positive</option>
+                        <option value="negative">Negative</option>
+                        <option value="neutral">Neutral</option>
+                      </select>
+                    </div>
+
+                    {wordFreq.length > 0 ? (
+                      <div className="w-full h-[60vh] flex items-center justify-center bg-gray-50 rounded-lg shadow-inner">
+                        <WordCloudSVG words={wordFreq} />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        No data to display for this sentiment.
+                      </p>
+                    )}
+                  </div>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      )}
     </>
   );
 }

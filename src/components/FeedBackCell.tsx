@@ -18,6 +18,7 @@ export function FeedbackCell({
 }: FeedbackCellProps) {
   const normalizedDefault = defaultValue.toLowerCase();
   const [selectedValue, setSelectedValue] = useState(normalizedDefault);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
 
   useEffect(() => {
@@ -43,8 +44,15 @@ export function FeedbackCell({
 
       <Button
         variant="default"
-        disabled={!isLowConfidence}
-        onClick={() => onSubmit(id, selectedValue)}
+        disabled={!isLowConfidence || isSubmitted || normalizedDefault === selectedValue}
+        // To test 100 entry for retrain model
+        // disabled={!isLowConfidence}
+        onClick={() => {
+          console.log("onSubmit triggered");
+
+          setIsSubmitted(true);
+          onSubmit(id, selectedValue);
+        }}
         className="bg-teal-600 mt-3 px-3 text-sm font-medium shadow-sm text-white hover:bg-teal-700 cursor-pointer hover:shadow-lg transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Submit Feedback
